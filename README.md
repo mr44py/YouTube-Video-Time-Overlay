@@ -18,3 +18,6 @@ Since this is a developer version, follow these steps to load it into Chrome:
 * `manifest.json`: Extension configuration.
 * `content.js`: Logic for the video overlay.
 * `popup.html/js`: Settings menu interface.
+
+* ## Links
+* [Install from Chrome Web Store] https://chromewebstore.google.com/detail/youtube-video-time-overla/idagcaajnhbnpdofldkjgfgjlkjeeohb
