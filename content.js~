@@ -1,0 +1,36 @@
+function addOverlay() {
+  const vid = document.querySelector('video');
+  if (!vid || document.querySelector('.my-custom-time-overlay')) return;
+
+  // Glavni overlay
+  const div = document.createElement("div");
+  div.className = "my-custom-time-overlay";
+  div.style.cssText = "position:absolute;z-index:2147483647;cursor:move;bottom:60px;right:20px;color:white;padding:6px 10px;font:bold 15px Arial;border-radius:6px;box-shadow:0 2px 6px #000;user-select:none;";
+
+  const timeSpan = document.createElement("span");
+  div.appendChild(timeSpan);
+  div.appendChild(setBtn);
+
+  const container = vid.closest('#movie_player, .html5-video-player') || vid.parentElement;
+  container.style.position = "relative";
+  container.appendChild(div);
+
+  // Dragging
+  let isDragging = false, offset;
+  div.onmousedown = e => { isDragging = true; offset = [div.offsetLeft - e.clientX, div.offsetTop - e.clientY]; };
+  document.onmousemove = e => { if (isDragging) { div.style.left = (e.clientX + offset[0]) + 'px'; div.style.top = (e.clientY + offset[1]) + 'px'; div.style.bottom = 'auto'; div.style.right = 'auto'; } };
+  document.onmouseup = () => isDragging = false;
+
+  // Update vremena i boje
+  vid.ontimeupdate = () => {
+    if (isNaN(vid.duration)) return;
+    const f = t => `${Math.floor(t / 60)}:${Math.floor(t % 60).toString().padStart(2, '0')}`;
+    timeSpan.textContent = `${f(vid.currentTime)} / ${f(vid.duration)}`;
+  };
+
+  const updateStyle = (val) => div.style.backgroundColor = `rgba(0,0,0,${val || 0.75})`;
+  chrome.storage.sync.get('overlayOpacity', d => updateStyle(d.overlayOpacity));
+  chrome.storage.onChanged.addListener(c => c.overlayOpacity && updateStyle(c.overlayOpacity.newValue));
+}
+
+new MutationObserver(() => addOverlay()).observe(document.body, { childList: true, subtree: true });
